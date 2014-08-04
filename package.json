@@ -1,0 +1,17 @@
+{
+    "name": "ip",
+    "version": "0.1.0",
+    "description": "get ip address",
+    "main": "index.js",
+    "author": {
+        "name": "Loye",
+        "email": "loye.qiu@gmail.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/loye/ip.git"
+    },
+    "dependencies": {
+        "express": "*"
+    }
+}
