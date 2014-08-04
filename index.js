@@ -34,6 +34,11 @@ function resolve(req) {
     return ip;
 }
 
+function reg(req) {
+    var name = req.query.name;
+    var ip = resolve(req);
+}
+
 process.on('uncaughtException', function (err) {
     console.log('[Error catched by process]' + err);
 });
