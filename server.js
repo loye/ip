@@ -7,7 +7,7 @@ var list = {};
 
 app.get('/', function (req, res) {
     res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(req.ip);
+    res.end(util.inspect(resolve(req)));
 }).get('/reg', function (req, res) {
     res.end(util.inspect(reg(req)));
 }).post('/reg', function (req, res) {
@@ -30,12 +30,20 @@ app.get('/', function (req, res) {
     res.end();
 }).listen(port);
 
+function resolve(req) {
+    return {
+        ip: req.ip,
+        'socket-ip': req.socket.remoteAddress,
+        'x-forwarded-for': req.headers['x-forwarded-for']
+    };
+}
+
 function reg(req) {
     var name = req.query.name, result;
     if (name) {
         var ext = req.query.ext;
         result = list[name] = {
-            ip: req.ip,
+            ip: resolve(req),
             since: new Date()
         };
         ext && (result.ext = ext);
