@@ -2,7 +2,7 @@
     "name": "ip",
     "version": "0.1.0",
     "description": "get ip address",
-    "main": "index.js",
+    "main": "server.js",
     "author": {
         "name": "Loye",
         "email": "loye.qiu@gmail.com"
