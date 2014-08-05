@@ -25,6 +25,9 @@ app.get('/', function (req, res) {
 }).get('/clear', function (req, res) {
     list = {};
     res.end('true');
+}).get('/debug', function (req, res) {
+    res.write(util.inspect(req.headers));
+    res.end();
 }).listen(port);
 
 function reg(req) {
