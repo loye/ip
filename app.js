@@ -23,7 +23,8 @@ function reg() {
         res.setEncoding('utf8');
         res.on('data', function (data) {
             console.log(data);
-        })
+        });
+        error_count = 0;
     }).on('error', function (err) {
         error_count++;
         console.log(err);
