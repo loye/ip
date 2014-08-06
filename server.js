@@ -53,7 +53,7 @@ function resolve(req) {
     };
     ip.ip || (ip.ip = ip['socket-ip']
         ? ip['socket-ip']
-        : (ip['x-forwarded-for'] ? ip['x-forwarded-for'].split(',')[0].split(':') : ''));
+        : (ip['x-forwarded-for'] ? ip['x-forwarded-for'].split(',')[0].split(':')[0] : ''));
     return ip;
 }
 
