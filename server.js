@@ -34,7 +34,7 @@ app.get('/', function (req, res) {
     var name = req.query.name;
     if (name) {
         if (list[name]) {
-            res.json(util.inspect(list[name], {depth: 5}));
+            res.write(util.inspect(list[name], {depth: 5}));
         }
     } else {
         res.write(util.inspect(list, {depth: 5}));
