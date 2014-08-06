@@ -21,6 +21,7 @@ app.use(function (req, res, callback) {
         callback();
     }
 });
+app.set('json spaces', 2);
 
 app.get('/', function (req, res) {
     res.json(resolve(req)).end();
