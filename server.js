@@ -5,6 +5,21 @@ var port = process.env.port || 1337;
 var app = express();
 var list = {};
 
+app.use(function (req, res, callback) {
+    if (req.readable) {
+        var content = '';
+        req.on('data', function (data) {
+            content += data;
+        }).on('end', function () {
+            req.body = content;
+            callback();
+        });
+    }
+    else {
+        callback();
+    }
+});
+
 app.get('/', function (req, res) {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(util.inspect(resolve(req)));
@@ -31,17 +46,21 @@ app.get('/', function (req, res) {
 }).listen(port);
 
 function resolve(req) {
-    return {
+    var ip = {
         ip: req.ip,
         'socket-ip': req.socket.remoteAddress,
         'x-forwarded-for': req.headers['x-forwarded-for']
     };
+    ip.ip || (ip.ip = ip['socket-ip']
+        ? ip['socket-ip']
+        : (ip['x-forwarded-for'] ? ip['x-forwarded-for'].split(',')[0].split(':') : ''));
+    return ip;
 }
 
 function reg(req) {
     var name = req.query.name, result;
     if (name) {
-        var ext = req.query.ext;
+        var ext = req.body;
         result = list[name] = {
             ip: resolve(req),
             since: new Date()
