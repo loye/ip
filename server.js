@@ -1,5 +1,4 @@
-var util = require('util'),
-    express = require('express');
+var express = require('express');
 
 var port = process.env.port || 1337;
 var app = express();
@@ -24,28 +23,26 @@ app.use(function (req, res, callback) {
 });
 
 app.get('/', function (req, res) {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(util.inspect(resolve(req)));
+    res.json(resolve(req)).end();
 }).get('/reg', function (req, res) {
-    res.end(util.inspect(reg(req)));
+    res.json(reg(req)).end();
 }).post('/reg', function (req, res) {
-    res.end(util.inspect(reg(req)));
+    res.json(reg(req)).end();
 }).get('/list', function (req, res) {
     var name = req.query.name;
     if (name) {
         if (list[name]) {
-            res.write(util.inspect(list[name], {depth: 5}));
+            res.json(list[name]);
         }
     } else {
-        res.write(util.inspect(list, {depth: 5}));
+        res.json(list);
     }
     res.end();
 }).get('/clear', function (req, res) {
     list = {};
-    res.end('true');
+    res.json({success: true}).end();
 }).get('/debug', function (req, res) {
-    res.write(util.inspect(req.headers));
-    res.end();
+    res.json(req.headers).end();
 }).listen(port);
 
 function resolve(req) {
@@ -54,9 +51,13 @@ function resolve(req) {
         'socket-ip': req.socket.remoteAddress,
         'x-forwarded-for': req.headers['x-forwarded-for']
     };
-    ip.ip || (ip.ip = ip['socket-ip']
-        ? ip['socket-ip']
-        : (ip['x-forwarded-for'] ? ip['x-forwarded-for'].split(',')[0].split(':')[0] : ''));
+    if (!ip.ip) {
+        if (ip['socket-ip']) {
+            ip.ip = ip['socket-ip']
+        } else if (ip['x-forwarded-for']) {
+            ip.ip = ip['x-forwarded-for'].split(',')[0].split(':')[0]
+        }
+    }
     return ip;
 }
 
