@@ -11,7 +11,10 @@ app.use(function (req, res, callback) {
         req.on('data', function (data) {
             content += data;
         }).on('end', function () {
-            req.body = content;
+            try {
+                req.post_ext = JSON.parse(content);
+            } catch (e) {}
+            req.post_ext || (req.post_ext = content);
             callback();
         });
     }
@@ -31,10 +34,10 @@ app.get('/', function (req, res) {
     var name = req.query.name;
     if (name) {
         if (list[name]) {
-            res.json(util.inspect(list[name]));
+            res.json(util.inspect(list[name], {depth: 5}));
         }
     } else {
-        res.write(util.inspect(list));
+        res.write(util.inspect(list, {depth: 5}));
     }
     res.end();
 }).get('/clear', function (req, res) {
@@ -60,12 +63,11 @@ function resolve(req) {
 function reg(req) {
     var name = req.query.name, result;
     if (name) {
-        var ext = req.body;
         result = list[name] = {
             ip: resolve(req),
             since: new Date()
         };
-        ext && (result.ext = ext);
+        req.post_ext && (result.ext = req.post_ext);
     }
     return result;
 }

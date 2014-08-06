@@ -1,5 +1,4 @@
 var http = require('http'),
-    util = require('util'),
     os = require('os');
 
 var name = os.hostname();
@@ -14,14 +13,14 @@ var options = {
     }
 };
 
-var ext = util.inspect(os.networkInterfaces());
+var ext = JSON.stringify(os.networkInterfaces());
 
 http.request(options, function (res) {
     res.setEncoding('utf8');
     res.on('data', function (data) {
         console.log(data);
     })
-}).end(util.inspect({"ext": ext}));
+}).end(ext);
 
 process.on('uncaughtException', function (err) {
     console.log('[Error catched by process]' + err);
