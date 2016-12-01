@@ -1,80 +1,53 @@
-var express = require('express');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-var port = process.env.port || 1337;
+var port = process.env.port || 4444;
 var app = express();
 var list = {};
 
-app.use(function (req, res, callback) {
-    if (req.readable) {
-        var content = '';
-        req.on('data', function (data) {
-            content += data;
-        }).on('end', function () {
-            try {
-                req.post_ext = JSON.parse(content);
-            } catch (e) {}
-            req.post_ext || (req.post_ext = content);
-            callback();
-        });
-    }
-    else {
-        callback();
-    }
-});
 app.set('json spaces', 2);
+app.set('trust proxy', true);
 
-app.get('/', function (req, res) {
-    res.json(resolve(req)).end();
-}).get('/reg', function (req, res) {
-    res.json(reg(req)).end();
-}).post('/reg', function (req, res) {
-    res.json(reg(req)).end();
-}).get('/list', function (req, res) {
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+
+app
+  .get('/', function (req, res) {
+    res.send({ip: req.ip});
+  })
+  .all('/reg', function (req, res) {
+    res.send(reg(req));
+  })
+  .get('/list', function (req, res) {
     var name = req.query.name;
     if (name) {
-        if (list[name]) {
-            res.json(list[name]);
-        }
+      if (list[name]) {
+        res.send(list[name]);
+      }
     } else {
-        res.json(list);
+      res.send(list);
     }
     res.end();
-}).get('/clear', function (req, res) {
+  })
+  .get('/clear', function (req, res) {
     list = {};
-    res.json({success: true}).end();
-}).get('/debug', function (req, res) {
-    res.json(req.headers).end();
-}).listen(port);
-
-function resolve(req) {
-    var ip = {
-        ip: req.ip,
-        'socket-ip': req.socket.remoteAddress,
-        'x-forwarded-for': req.headers['x-forwarded-for']
-    };
-    if (!ip.ip) {
-        if (ip['socket-ip']) {
-            ip.ip = ip['socket-ip']
-        } else if (ip['x-forwarded-for']) {
-            ip.ip = ip['x-forwarded-for'].split(',')[0].split(':')[0]
-        }
-    }
-    return ip;
-}
+    res.send({success: true});
+  })
+  .get('/headers', function (req, res) {
+    res.send(req.headers);
+  })
+  .listen(port, function () {
+    console.info('server started on port', port);
+  });
 
 function reg(req) {
-    var name = req.query.name, result;
-    if (name) {
-        result = list[name] = {
-            ip: resolve(req),
-            since: new Date()
-        };
-        req.post_ext && (result.ext = req.post_ext);
-    }
-    return result;
+  var name = req.query.name, result;
+  if (name) {
+    result = list[name] = {
+      ip: req.ip,
+      since: new Date()
+    };
+    req.body && (result.ext = req.body);
+  }
+  return result;
 }
-
-
-process.on('uncaughtException', function (err) {
-    console.log('[Error catched by process]' + err);
-});
