@@ -7,7 +7,7 @@ var error_limit = 24;
 
 var options = {
   hostname: 'localhost',
-  port: 4444,
+  port: 1444,
   path: '/reg?name=' + name,
   method: 'POST',
   headers: {
